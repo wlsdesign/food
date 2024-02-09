@@ -16,13 +16,15 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.vendamais.food"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#0F172A"
-      }
+      },
+      "package": "com.vendamais.food"
     },
     "web": {
       "bundler": "metro",
@@ -35,6 +37,14 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "664d7b71-5ffc-45a6-8358-6fc397a50138"
+      }
     }
   }
 }
