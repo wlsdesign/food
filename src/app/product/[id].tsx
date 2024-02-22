@@ -1,5 +1,5 @@
-import React from "react";
-import { View, Text, Image } from "react-native";
+import React, { useState } from "react";
+import { View, Text, Image, TouchableOpacity } from "react-native";
 import { Feather } from "@expo/vector-icons";
 
 import { useCartStore } from "@/stores/cart-store";
@@ -10,18 +10,30 @@ import { PRODUCTS } from "@/utils/data/products";
 import { formatCurrency } from "@/utils/functions/format-currency";
 
 import { Button } from "@/components/button";
-import { LinkButton } from "@/components/link-button";
+import { Input } from "@/components/input";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 export default function Product() {
+  const [comment, setComment] = useState('')
+  const [quantity, setQuantity] = useState(1)
   const cartStore = useCartStore()
   const navigation = useNavigation();
   const { id } = useLocalSearchParams()
 
   const product = PRODUCTS.find((item) => item.id === id)
+  const isDisableButton = quantity > 1 ? false : true
 
   function handleAddToCart() {
-    cartStore.add(product!)
+    cartStore.add(product!, comment, quantity)
     navigation.goBack()
+  }
+
+  function handleIncrementOrder() {
+    setQuantity(quantity + 1);
+  }
+
+  function handleDecrementOrder() {
+    setQuantity(quantity - 1);
   }
 
   if(!product){
@@ -29,39 +41,68 @@ export default function Product() {
   }
   
   return (
-    <View className="flex-1">
-      <Image source={product.cover} className="w-full h-52" resizeMode="cover" />
+    <View className="flex-1 relative">
+      <Image source={{ uri: product.cover}} className="w-full h-52 border-0" resizeMode="cover" />
 
-      <View className="p-5 mt-1 flex-1">
-        <Text className="text-white font-heading text-xl">
-          {product.title}
-        </Text>
+      <TouchableOpacity
+        className="absolute top-10 left-5 w-10 h-10 bg-white rounded-full items-center justify-center"
+        activeOpacity={1}
+        onPress={navigation.goBack}
+      >
+        <View className="w-3 h-3 border-lime-600 border-l-2 border-b-2 ml-1 rotate-45"></View>
+      </TouchableOpacity>
 
-        <Text className="text-lime-400 text-2xl font-heading my-2">
-          {formatCurrency(product.price)}
-        </Text>
-
-        <Text className="text-slate-400 font-body text-base leading-6 mb-6">
-          {product.description}
-        </Text>
-
-        {product.ingredients.map((ingredient) => (
-          <Text className="text-slate-400 font-body text-base leading-6" key={ingredient}>
-            {"\u2022"} {ingredient}
+      <KeyboardAwareScrollView>
+        <View className="p-5 mt-1 flex-1">
+          <Text className="text-white font-heading text-xl">
+            {product.title}
           </Text>
-        ))}
-      </View>
 
-      <View className="p-5 pb-8 gap-4">
-        <Button onPress={handleAddToCart}>
+          <Text className="text-lime-400 text-2xl font-heading my-2">
+            {formatCurrency(product.price)}
+          </Text>
+
+          <Text className="text-slate-400 font-body text-base leading-6 mb-6">
+            {product.description}
+          </Text>
+
+          <View className="mt-4">
+            <View className="flex-row items-center justify-between mb-2">
+              <Text className="text-white text-lg font-base">📝 Alguma observação?</Text>
+              <Text className="text-slate-100">{`${comment.length}/140`}</Text>
+            </View>
+
+            <Input 
+              placeholder="Ex: tirar a cebola, maionese à parte etc."
+              onChangeText={setComment}
+              blurOnSubmit={true}
+              returnKeyType="send"
+              maxLength={140}
+            />
+          </View>
+        </View>
+      </KeyboardAwareScrollView>
+
+      <View className="p-5 pb-8 gap-4 flex-row items-center justify-around">
+        <View className="flex-row gap-5">
+          <TouchableOpacity activeOpacity={1} disabled={isDisableButton} className="h-10" onPress={handleDecrementOrder}>
+            <Feather name="minus" color={`${quantity > 1 ? 'white' : 'gray'}`} size={20} />
+          </TouchableOpacity>
+
+          <Text className="text-lime-500">{quantity}</Text>
+
+          <TouchableOpacity activeOpacity={1} onPress={handleIncrementOrder}>
+            <Feather name="plus" color="white" size={20} />
+          </TouchableOpacity>
+        </View>
+
+        <Button onPress={handleAddToCart} className="rounded-md px-3 w-56">
           <Button.Icon>
             <Feather name="plus-circle" size={20} />
           </Button.Icon>
 
-          <Button.Text>Adicionar ao pedido</Button.Text>
+          <Button.Text>Adicionar</Button.Text>
         </Button>
-
-        <LinkButton title="Voltar ao cardápio" href="/" />
       </View>
     </View>
   )

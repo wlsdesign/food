@@ -1,11 +1,11 @@
-import React, { useState } from "react"
-import { View, Text, ScrollView, Alert, Linking } from "react-native"
+import React, { useEffect, useState } from "react"
+import { View, Text, ScrollView, Alert, Linking, TouchableOpacity } from "react-native"
 import { useNavigation } from "expo-router"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 
 import { useCartStore } from "@/stores/cart-store"
 
-import { Header } from "@/components/header"
+import { Header } from "@/components/header" 
 import { Product } from "@/components/product"
 import { formatCurrency } from "@/utils/functions/format-currency"
 import { Input } from "@/components/input"
@@ -13,21 +13,36 @@ import { Button } from "@/components/button"
 import { Feather } from "@expo/vector-icons"
 import { LinkButton } from "@/components/link-button"
 import { ProductProps } from "@/utils/data/products"
+import { SETTINGS } from "@/utils/settings/settings"
+import { Dropdown } from "@/components/dropdown"
+import Message from "@/components/toast-message"
 
-// const PHONE_NUMBER = '5521970176922'
-const PHONE_NUMBER = '5511992152000'
+const PHONE_NUMBER = '5521970176922'
+// const PHONE_NUMBER = '5511992152000'
 
 export default function Cart(){
   const [address, setAddress] = useState('')
+  const [nameUser, setNameUser] = useState('')
+  const [selected, setSelected] = React.useState(100);
+  const [payment, setPayment] = React.useState("");
+  const [amount, setAmount] = React.useState('');
+  const [messageType, setMessageType] = React.useState('');
+  const [messages, setMessages] = React.useState<string[]>([]);
   const cartStore = useCartStore()
   const navigation = useNavigation()
 
-  const total = formatCurrency(
-    cartStore.products.reduce(
-      (total, product) => total + product.price * product.quantity,
-      0
-    )
-  )
+  function sumPriceToOrder(price: number = 0){
+    const total = formatCurrency(
+      cartStore.products.reduce(
+        (total, product) => total + product.price * product.quantity,
+        0
+      ) + price) 
+    setAmount(total)
+  }
+
+  useEffect(() => {
+    sumPriceToOrder();
+  }, [])
 
   function handleProductRemove(product: ProductProps) {
     Alert.alert("Remover", `Deseja remover ${product.title} do carrinho?`, [
@@ -36,25 +51,42 @@ export default function Cart(){
       },
       {
         text: 'Remover',
-        onPress: () => cartStore.remove(product.id)
+        onPress: () => {
+          cartStore.remove(product.id)
+          setMessages([...messages, `${product.title} removido do carrinho`]);
+          setMessageType('success')
+        }
       }
     ])
   }
 
   function handleOrder() {
-    if(address.trim().length === 0){
-      return Alert.alert('Pedido', 'Informe os dados da entrega.')
+    if(nameUser === ''){
+      return Alert.alert('Obrigatório', 'Favor preencher seu nome.')
     }
 
-    const products = cartStore.products.map((product) => `\n ${product.quantity} ${product.title}`).join('')
+    if(selected === 100){
+      return Alert.alert('Obrigatório', 'Escolha o local da entrega.')
+    }
+
+    if(payment === ''){
+      return Alert.alert('Obrigatório', 'Escolha a forma de pagamento.')
+    }
+
+    if(address.trim().length === 0 && selected !== 0){
+      return Alert.alert('Pedido', 'Informe seu endereço de entrega.')
+    }
+
+    const products = cartStore.products.map((product) => `\n ${product.quantity} - ${product.title} \n \n ${product.comment && '*OBS:* ' + product.comment} \n -------------- \n`).join('')
 
     const message = `
-    🍔 NOVO PEDIDO
-    \n Entregar em: ${address}
+    🍔 NOVO PEDIDO!
+    \n *Responsável pelo pedido:* ${nameUser}
+    \n 📍 *Entregar em:* ${address}
 
+    📦 *Iten(s) do  Pedido:*
     ${products}
-
-    \n Valor total: ${total}
+    \n 💰 *Valor total:* ${amount}
     `
 
     Linking.openURL(`http://api.whatsapp.com/send?phone=${PHONE_NUMBER}&text=${message}`)
@@ -64,7 +96,32 @@ export default function Cart(){
   }
 
   return (
-      <View className="flex-1 pt-8">
+    <View className="flex-1 pt-8">
+      <View
+        style={{
+          position: 'absolute',
+          top: 45,
+          left: 0,
+          right: 0,
+        }}
+      >
+        {messages.map((message) => (
+          <Message
+            key={message}
+            type={messageType}
+            message={message}
+            onHide={() => {
+              setMessages((messages) =>
+                messages.filter(
+                  (currentMessage) =>
+                    currentMessage !== message
+                )
+              );
+            }}
+          />
+        ))}
+      </View>
+
       <Header title="Seu carrinho" />
       <KeyboardAwareScrollView>
         <ScrollView>
@@ -72,27 +129,61 @@ export default function Cart(){
             <View className="p-5">
               <View className="">
                 {cartStore.products.map((product) => (
-                  <Product
-                    key={product.id}
-                    data={product}
-                    onPress={() => handleProductRemove(product)} />
+                  <View key={product.id} className="flex-row justify-around items-center gap-2">
+                    <Product
+                      data={product}
+                      activeOpacity={1}
+                    />
+                    <TouchableOpacity onPress={() => handleProductRemove(product)}>
+                      <Feather name="trash-2" size={20} color="white" />
+                    </TouchableOpacity>
+                  </View>
                 ))}
               </View>
 
+              <Input 
+                  placeholder="Digite seu nome"
+                  onChangeText={setNameUser}
+                  className="mb-4 h-12"
+                />
+
+              <Dropdown
+                setSelected={(val: React.SetStateAction<number>) => {
+                  setSelected(val)
+                }}
+                onSelect={() => sumPriceToOrder(selected)}
+                data={SETTINGS.neighborhood} 
+                save="key"
+                placeholder="Escolha o bairro para a entrega"
+              />
+
+              <Dropdown
+                setSelected={(val: React.SetStateAction<string>) => {
+                  setPayment(val)
+                }} 
+                data={SETTINGS.paymentType} 
+                save="value"
+                placeholder="Escolha o método de pagamento"
+              />
+
               <View className="flex-row gap-2 items-center mt-2 mb-4">
                 <Text className="text-white text-xl font-subTitle">Total: </Text>
-                <Text className="text-lime-400 text-2xl font-heading">{total}</Text>
+                <Text className="text-lime-400 text-2xl font-heading">{amount}</Text>
               </View>
 
-              <Input 
-                placeholder="Informe seu endereço de entrega com rua, bairro, CEP, número e complemento..."
-                onChangeText={setAddress}
-                blurOnSubmit={true}
-                onSubmitEditing={handleOrder}
-                returnKeyType="send"
-              />
-              <View className="p-5 gap-5">
-                <Button onPress={handleOrder}>
+              {selected !== 100 && selected !== 0 && payment !== '' &&
+                <Input 
+                  placeholder="Informe seu endereço de entrega com rua, bairro, CEP, número e complemento..."
+                  onChangeText={setAddress}
+                  blurOnSubmit={true}
+                  onSubmitEditing={handleOrder}
+                  returnKeyType="send"
+                  className="mb-4"
+                />
+              }
+
+              <View className="gap-5">
+                <Button onPress={handleOrder} className="rounded-md">
                   <Button.Text>Enviar Pedido</Button.Text>
                   <Button.Icon>
                     <Feather name="arrow-right-circle" size={20} />

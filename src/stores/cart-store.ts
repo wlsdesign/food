@@ -7,11 +7,12 @@ import * as cartInMemory from "./helpers/cart-in-memory"
 
 export type ProductCartProps = ProductProps & {
   quantity: number
+  comment?: string
 } 
 
 type StateProps = {
   products: ProductCartProps[]
-  add: (Product: ProductProps) => void
+  add: (Product: ProductProps, comment: string, quantity: number) => void
   remove: (ProductId: string) => void
   clear: () => void
 }
@@ -19,9 +20,11 @@ type StateProps = {
 export const useCartStore = create(
   persist<StateProps>((set) =>({
   products: [],
-  add: (product: ProductProps) =>
+  comment: "",
+  quantity: 0,
+  add: (product: ProductProps, comment: string, quantity: number) =>
     set((state) => ({
-      products: cartInMemory.add(state.products, product),
+      products: cartInMemory.add(state.products, product, comment, quantity),
     })),
   remove: (productId: string) =>
     set((state) => ({
