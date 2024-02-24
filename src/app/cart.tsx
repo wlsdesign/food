@@ -16,6 +16,7 @@ import { ProductProps } from "@/utils/data/products"
 import { SETTINGS } from "@/utils/settings/settings"
 import { Dropdown } from "@/components/dropdown"
 import Message from "@/components/toast-message"
+import AsyncStorage from "@react-native-async-storage/async-storage"
 
 const PHONE_NUMBER = '5521970176922'
 // const PHONE_NUMBER = '5511992152000'
@@ -91,6 +92,10 @@ export default function Cart(){
 
     Linking.openURL(`http://api.whatsapp.com/send?phone=${PHONE_NUMBER}&text=${message}`)
 
+    AsyncStorage.setItem(
+      'name-user',
+      nameUser,
+    );
     cartStore.clear()
     navigation.goBack()
   }

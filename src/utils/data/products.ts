@@ -9,7 +9,7 @@ const MENU = [
         title: "CALABRESO",
         price: 30,
         description: "Pão australiano, Hambúrguer de 150g, Cebola caramelizada, Calabresa, Picles, Catupiry Original quatro queijos.",
-      cover: `${URL_BASE}/calabreso.png`,
+      cover: `${URL_BASE}/calabreso.jpg`,
       thumbnail: `${URL_BASE}/calabreso.jpg`,
       },
       {
@@ -324,4 +324,4 @@ const CATEGORIES = MENU.map((item) => item.title)
 
 type ProductProps = (typeof PRODUCTS)[0]
 
-export { MENU, PRODUCTS, CATEGORIES, ProductProps }
+export { MENU, PRODUCTS, CATEGORIES, ProductProps, URL_BASE }

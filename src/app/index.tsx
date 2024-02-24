@@ -9,6 +9,7 @@ import { CATEGORIES, MENU, ProductProps } from '@/utils/data/products'
 import { CategoryButton } from '@/components/category-button'
 import { Header } from '@/components/header'
 import { Product } from '@/components/product'
+import { api } from '@/services/api'
 
 export default function Home() {
   const cartSore = useCartStore()
