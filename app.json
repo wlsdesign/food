@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Thiagão Burguer",
-    "slug": "Thiagao Burguer",
+    "slug": "thiagao-burguer",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -43,8 +43,9 @@
         "origin": false
       },
       "eas": {
-        "projectId": "664d7b71-5ffc-45a6-8358-6fc397a50138"
+        "projectId": "c0fb44e2-765c-45e6-888e-5b5e52eee6c0"
       }
-    }
+    },
+    "owner": "washingtonluiz"
   }
 }

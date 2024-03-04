@@ -9,7 +9,6 @@ import { CATEGORIES, MENU, ProductProps } from '@/utils/data/products'
 import { CategoryButton } from '@/components/category-button'
 import { Header } from '@/components/header'
 import { Product } from '@/components/product'
-import { api } from '@/services/api'
 
 export default function Home() {
   const cartSore = useCartStore()
@@ -66,24 +65,21 @@ export default function Home() {
   return (
     <View className="flex-1 pt-12">
       <Header title="Faça seu pedido" cartQuantityItems={cartQuantityItems} />
-      
       <FlatList
         ref={flatListRef}
         data={CATEGORIES}
         keyExtractor={(item) => item}
         renderItem={({ item }) => (
-          <CategoryButton 
+          <CategoryButton
             title={item}
             isSelected={item === category}
-            onPress={() => handleCategorySelect(item)}
-          />
+            onPress={() => handleCategorySelect(item)} />
         )}
         horizontal
         className='max-h-10 mt-5 px-5'
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ gap: 10, paddingRight: 40 }}
+        contentContainerStyle={{ gap: 10, paddingRight: 40 }} 
       />
-
       <SectionList
         ref={sectionListRef}
         sections={MENU}

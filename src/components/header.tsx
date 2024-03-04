@@ -13,16 +13,6 @@ type HeaderProps = {
 export function Header({ title, cartQuantityItems = 0 }: HeaderProps) {
   const [userName, setUserName] = useState('')
 
-  const getUserName = () => {
-    AsyncStorage.getItem('name-user', (err, value: any) => {
-      if (err) {
-        console.log('Error: ', err)
-      } else {
-        return JSON.parse(value)
-      }
-    })
-  };
-
   useEffect(() => {
     AsyncStorage.getItem('name-user', (err, value: any) => {
       if (err) {

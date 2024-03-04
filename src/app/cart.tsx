@@ -18,7 +18,7 @@ import { Dropdown } from "@/components/dropdown"
 import Message from "@/components/toast-message"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 
-const PHONE_NUMBER = '5521970176922'
+const PHONE_NUMBER = '5512988276684'
 // const PHONE_NUMBER = '5511992152000'
 
 export default function Cart(){
@@ -26,23 +26,31 @@ export default function Cart(){
   const [nameUser, setNameUser] = useState('')
   const [selected, setSelected] = React.useState(100);
   const [payment, setPayment] = React.useState("");
-  const [amount, setAmount] = React.useState('');
+  const [amount, setAmount] = React.useState(0);
   const [messageType, setMessageType] = React.useState('');
   const [messages, setMessages] = React.useState<string[]>([]);
   const cartStore = useCartStore()
   const navigation = useNavigation()
 
   function sumPriceToOrder(price: number = 0){
-    const total = formatCurrency(
+    const total = 
       cartStore.products.reduce(
         (total, product) => total + product.price * product.quantity,
         0
-      ) + price) 
-    setAmount(total)
+      )
+    setAmount(total + price)
   }
 
   useEffect(() => {
     sumPriceToOrder();
+
+    AsyncStorage.getItem('name-user', (err, value: any) => {
+      if (err) {
+        console.log('Error: ', err)
+      } else {
+        setNameUser(value)
+      }
+    })
   }, [])
 
   function handleProductRemove(product: ProductProps) {
@@ -56,6 +64,7 @@ export default function Cart(){
           cartStore.remove(product.id)
           setMessages([...messages, `${product.title} removido do carrinho`]);
           setMessageType('success')
+          setAmount(amount - product.price)
         }
       }
     ])
@@ -87,7 +96,7 @@ export default function Cart(){
 
     📦 *Iten(s) do  Pedido:*
     ${products}
-    \n 💰 *Valor total:* ${amount}
+    \n 💰 *Valor total:* ${formatCurrency(amount)}
     `
 
     Linking.openURL(`http://api.whatsapp.com/send?phone=${PHONE_NUMBER}&text=${message}`)
@@ -150,6 +159,7 @@ export default function Cart(){
                   placeholder="Digite seu nome"
                   onChangeText={setNameUser}
                   className="mb-4 h-12"
+                  value={nameUser}
                 />
 
               <Dropdown
@@ -173,7 +183,7 @@ export default function Cart(){
 
               <View className="flex-row gap-2 items-center mt-2 mb-4">
                 <Text className="text-white text-xl font-subTitle">Total: </Text>
-                <Text className="text-lime-400 text-2xl font-heading">{amount}</Text>
+                <Text className="text-lime-400 text-2xl font-heading">{formatCurrency(amount)}</Text>
               </View>
 
               {selected !== 100 && selected !== 0 && payment !== '' &&

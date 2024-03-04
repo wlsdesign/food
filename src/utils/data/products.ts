@@ -9,7 +9,7 @@ const MENU = [
         title: "CALABRESO",
         price: 30,
         description: "Pão australiano, Hambúrguer de 150g, Cebola caramelizada, Calabresa, Picles, Catupiry Original quatro queijos.",
-      cover: `${URL_BASE}/calabreso.jpg`,
+      cover: `${URL_BASE}/calabreso.png`,
       thumbnail: `${URL_BASE}/calabreso.jpg`,
       },
       {
