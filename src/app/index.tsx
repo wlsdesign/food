@@ -64,7 +64,8 @@ export default function Home() {
 
   return (
     <View className="flex-1 pt-12">
-      <Header title="Faça seu pedido" cartQuantityItems={cartQuantityItems} />
+      <Header title="Faça seu pedido" />
+
       <FlatList
         ref={flatListRef}
         data={CATEGORIES}
@@ -80,6 +81,7 @@ export default function Home() {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{ gap: 10, paddingRight: 40 }} 
       />
+      
       <SectionList
         ref={sectionListRef}
         sections={MENU}

@@ -110,7 +110,7 @@ export default function Cart(){
   }
 
   return (
-    <View className="flex-1 pt-8">
+    <View className="flex-1 pt-12">
       <View
         style={{
           position: 'absolute',

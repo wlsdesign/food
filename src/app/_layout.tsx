@@ -5,6 +5,7 @@ import { useFonts, Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_7
 
 import { Loading } from "@/components/loading"
 import { ProductProps } from '@/utils/data/products'
+import { TabNavigationBar } from '@/components/tabNavigationBar'
 
 type apiStoreProps = {
   "menu": ProductProps[]
@@ -59,7 +60,10 @@ export default function Layout(){
     }
 
     {!isLoading &&
+    <>
       <Slot />
+      <TabNavigationBar />
+    </>
     }
 
   </SafeAreaView>
