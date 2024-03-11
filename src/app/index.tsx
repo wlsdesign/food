@@ -3,7 +3,6 @@ import { View, Text, FlatList, SectionList } from 'react-native'
 
 import { Link } from 'expo-router'
 
-import { useCartStore } from '@/stores/cart-store'
 import { CATEGORIES, MENU, ProductProps } from '@/utils/data/products'
 
 import { CategoryButton } from '@/components/category-button'
@@ -11,14 +10,11 @@ import { Header } from '@/components/header'
 import { Product } from '@/components/product'
 
 export default function Home() {
-  const cartSore = useCartStore()
   const [category, setCategory] = useState(CATEGORIES[0])
   const [isScrollCategories, setIsScrollCategories] = useState(0)
 
   const sectionListRef = useRef<SectionList<ProductProps>>(null)
   const flatListRef = useRef<FlatList>(null)
-
-  const cartQuantityItems = cartSore.products.reduce((total, product) => total + product.quantity, 0)
 
   function handleCategorySelect(selectedCategory: string) {
     setCategory(selectedCategory)
@@ -37,7 +33,11 @@ export default function Home() {
     }
   }
 
-  const categoryIndex: any = {
+  type CategoryIndexProps = {
+    [key: string]: number;
+  }
+
+  const categoryIndex: CategoryIndexProps = {
     'Burguer 150g - Especial': 0,
     'Burguer 150g': 1,
     'Burguer 80g': 2,

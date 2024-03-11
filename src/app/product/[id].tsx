@@ -49,7 +49,7 @@ export default function Product() {
       if (err) {
         console.log('Error: ', err)
       } else {
-        if(value.includes(product.id)){
+        if(value?.includes(product.id)){
           setIsFavorite(true)
         }else{
           setIsFavorite(false)
